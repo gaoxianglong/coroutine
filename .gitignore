@@ -1,0 +1,9 @@
+# IntelliJ project files
+.idea
+*.iml
+
+# for Maven
+logs
+coroutine-agent/target/
+coroutine-api/target/
+coroutine-client/target/
