@@ -29,9 +29,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             UseCoroutine coroutine = new UseCoroutine();
-            coroutine.run(100);
+            coroutine.run(100);//调用协程
             log.info("tid:{}, coroutine running...", Thread.currentThread().getId());
-            coroutine.run(100);
+            coroutine.run(100);//切换当前线程的运行时上下文,用户态操作
         } catch (Throwable e) {
             e.printStackTrace();
         }
