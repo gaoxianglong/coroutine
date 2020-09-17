@@ -1,5 +1,5 @@
 # coroutine
-基于字节码增强技术实现一个协程Demo
+基于Java字节码增强技术实现的协程Demo
 
 ## 执行步骤
 1、git clone git@github.com:gaoxianglong/coroutine.git<br>
