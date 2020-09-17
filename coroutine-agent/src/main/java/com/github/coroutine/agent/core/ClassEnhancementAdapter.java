@@ -61,7 +61,6 @@ public class ClassEnhancementAdapter extends ClassVisitor {
                 && !name.equals(Constants.CONSTRUCT_INTERNAL_NAME)
                 && name.equals(Constants.DEFAULT_COROUTINE_METHOD)) {
             methodVisitor = new MethodEnhancementAdapter(methodVisitor, className, l0);
-            methodVisitor.visitEnd();
         }
         return methodVisitor;
     }

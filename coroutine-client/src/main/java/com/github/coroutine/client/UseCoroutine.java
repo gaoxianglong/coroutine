@@ -32,7 +32,7 @@ public class UseCoroutine implements Coroutine {
     public void run(int param) {
         log.info("tid:{},param:{}", Thread.currentThread().getId(), param);
         param <<= 2;
-        suspend();//调用挂起函数挂起协程
+        this.suspend();//调用挂起函数挂起协程
         log.info("tid:{},param:{}", Thread.currentThread().getId(), param);
     }
 }

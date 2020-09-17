@@ -31,6 +31,7 @@ public class MethodEnhancementAdapter extends MethodVisitor {
     private MethodVisitor mv;
     private String className;
     private Label l0;
+    private boolean isEnhancement;
 
     public MethodEnhancementAdapter(MethodVisitor methodVisitor, String className, Label l0) {
         super(Opcodes.ASM5, methodVisitor);
@@ -45,6 +46,15 @@ public class MethodEnhancementAdapter extends MethodVisitor {
         mv.visitFieldInsn(Opcodes.GETSTATIC, className, "code", "Ljava/lang/ThreadLocal;");
         mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
         mv.visitJumpInsn(Opcodes.IFNONNULL, l0);
+    }
+
+    @Override
+    public void visitEnd() {
+        if (!isEnhancement) {
+            mv.visitLabel(l0);
+            mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+            mv.visitInsn(Opcodes.RETURN);
+        }
     }
 
     @Override
@@ -77,6 +87,7 @@ public class MethodEnhancementAdapter extends MethodVisitor {
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
             mv.visitFieldInsn(Opcodes.GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
+            isEnhancement = true;
             return;
         }
         mv.visitMethodInsn(opcode, owner, name, desc, itf);
