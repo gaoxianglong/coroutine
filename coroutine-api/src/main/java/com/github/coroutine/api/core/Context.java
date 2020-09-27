@@ -15,30 +15,40 @@
  */
 package com.github.coroutine.api.core;
 
-import com.github.coroutine.api.exception.CoroutineException;
-
 /**
+ * 保存函数调用堆栈
+ *
  * @author gao_xianglong@sina.com
  * @version 0.1-SNAPSHOT
- * @date created in 2020/9/16 1:58 上午
+ * @date created in 2020/9/27 1:46 下午
  */
-public interface Coroutine {
+public class Context {
     /**
-     * 上下文对象,用于保存函数调用堆栈
+     * 指令标记,类似指令位置
      */
-    ThreadLocal<Context> context = new ThreadLocal<>();
+    public int flag;
+    /**
+     * 方法入参
+     */
+    public Object param;
 
-    /**
-     * 挂起函数,用于挂起协程
-     */
-    default void suspend() {
-        throw new CoroutineException();
+    public Context(int flag) {
+        this.flag = flag;
     }
 
-    /**
-     * 协程函数
-     *
-     * @param param
-     */
-    void run(int param);
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public void setParam(Object param) {
+        this.param = param;
+    }
+
+    @Override
+    public String toString() {
+        return "Context{" +
+                "flag=" + flag +
+                ", param=" + param +
+                '}';
+    }
 }

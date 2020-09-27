@@ -32,7 +32,6 @@ public class Main {
             coroutine.run(100);//调用协程
             log.info("tid:{}, coroutine running...", Thread.currentThread().getId());
             coroutine.run(100);//切换当前线程的运行时上下文,用户态操作
-            System.in.read();
         } catch (Throwable e) {
             e.printStackTrace();
         }
