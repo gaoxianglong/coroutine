@@ -27,31 +27,44 @@ import org.objectweb.asm.Opcodes;
  * @version 0.1-SNAPSHOT
  * @date created in 2020/9/17 2:19 上午
  */
-public class MethodEnhancementAdapter extends MethodVisitor {
+public class MethodEnhancementAdapter extends MethodVisitor implements Opcodes {
     private MethodVisitor mv;
     private String className;
-    private Label l0;
+    private Label l0, l1;
     private boolean isEnhancement;
 
-    public MethodEnhancementAdapter(MethodVisitor methodVisitor, String className, Label l0) {
+    public MethodEnhancementAdapter(MethodVisitor methodVisitor, String className) {
         super(Opcodes.ASM5, methodVisitor);
         this.mv = methodVisitor;
         this.className = className;
-        this.l0 = l0;
+        this.l0 = new Label();
+        this.l1 = new Label();
     }
+
 
     @Override
     public void visitCode() {
         mv.visitCode();
-        mv.visitFieldInsn(Opcodes.GETSTATIC, className, "code", "Ljava/lang/ThreadLocal;");
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
-        mv.visitJumpInsn(Opcodes.IFNONNULL, l0);
+        mv.visitFieldInsn(GETSTATIC, className, "flag", "Ljava/lang/ThreadLocal;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
+        mv.visitJumpInsn(IFNONNULL, l0);
+        mv.visitFieldInsn(GETSTATIC, className, "flag", "Ljava/lang/ThreadLocal;");
+        mv.visitInsn(ICONST_0);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false);
+        mv.visitLabel(l0);
+        mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+        mv.visitFieldInsn(GETSTATIC, className, "flag", "Ljava/lang/ThreadLocal;");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
+        mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+        mv.visitJumpInsn(IFNE, l1);
     }
 
     @Override
     public void visitEnd() {
         if (!isEnhancement) {
-            mv.visitLabel(l0);
+            mv.visitLabel(l1);
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             mv.visitInsn(Opcodes.RETURN);
         }
@@ -67,26 +80,26 @@ public class MethodEnhancementAdapter extends MethodVisitor {
         //INVOKEVIRTUAL suspend时才继续增强
         if (opcode == Opcodes.INVOKEVIRTUAL && name.equals(Constants.SUSPEND_METHOD_NAME)) {
             mv.visitInsn(Opcodes.POP);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className, "code", "Ljava/lang/ThreadLocal;");
-            mv.visitInsn(Opcodes.ICONST_1);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
-            mv.visitVarInsn(Opcodes.ILOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false);
-            mv.visitInsn(Opcodes.RETURN);
-            mv.visitLabel(l0);
+            mv.visitFieldInsn(GETSTATIC, className, "flag", "Ljava/lang/ThreadLocal;");
+            mv.visitInsn(ICONST_1);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false);
+            mv.visitFieldInsn(GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
+            mv.visitVarInsn(ILOAD, 1);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "set", "(Ljava/lang/Object;)V", false);
+            mv.visitInsn(RETURN);
+            mv.visitLabel(l1);
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
-            mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Integer");
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
-            mv.visitVarInsn(Opcodes.ISTORE, 1);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className, "code", "Ljava/lang/ThreadLocal;");
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
-            mv.visitFieldInsn(Opcodes.GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
+            mv.visitFieldInsn(GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "get", "()Ljava/lang/Object;", false);
+            mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+            mv.visitVarInsn(ISTORE, 1);
+            mv.visitFieldInsn(GETSTATIC, className, "flag", "Ljava/lang/ThreadLocal;");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
+            mv.visitFieldInsn(GETSTATIC, className, "param", "Ljava/lang/ThreadLocal;");
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/ThreadLocal", "remove", "()V", false);
             isEnhancement = true;
             return;
         }

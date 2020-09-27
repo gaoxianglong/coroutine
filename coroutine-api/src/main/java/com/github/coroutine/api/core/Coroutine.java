@@ -26,7 +26,7 @@ public interface Coroutine {
     /**
      * 任务的运行时上下文状态标记
      */
-    ThreadLocal<Integer> code = new ThreadLocal<>();
+    ThreadLocal<Integer> flag = new ThreadLocal<>();
     /**
      * 函数调用堆栈信息
      */

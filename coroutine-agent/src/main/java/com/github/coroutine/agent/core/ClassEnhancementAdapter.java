@@ -17,7 +17,6 @@ package com.github.coroutine.agent.core;
 
 import com.github.coroutine.agent.Constants;
 import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -33,12 +32,10 @@ import java.util.Objects;
 public class ClassEnhancementAdapter extends ClassVisitor {
     private String className;
     private boolean isInterface;
-    private Label l0;
 
     public ClassEnhancementAdapter(int api, ClassVisitor cv, String className) {
         super(api, cv);
         this.className = className;
-        this.l0 = new Label();
     }
 
     @Override
@@ -60,7 +57,7 @@ public class ClassEnhancementAdapter extends ClassVisitor {
         if (!isInterface && Objects.nonNull(methodVisitor)
                 && !name.equals(Constants.CONSTRUCT_INTERNAL_NAME)
                 && name.equals(Constants.DEFAULT_COROUTINE_METHOD)) {
-            methodVisitor = new MethodEnhancementAdapter(methodVisitor, className, l0);
+            methodVisitor = new MethodEnhancementAdapter(methodVisitor, className);
         }
         return methodVisitor;
     }
